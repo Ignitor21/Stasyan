@@ -2,17 +2,18 @@
   #include <iostream>
   #include <string>
   #include <limits>
+  #include "scanner.hxx"
 %}
 
-
 %option c++ noyywrap nounput noinput batch
+%option yyclass="scanner"
 
 WS       [ \n\f\r\t\v]
 ID       [a-z][a-zA-Z_0-9]*
 TYPEID   [A-Z][a-zA-Z_0-9]*
 NUMBER   (0|[1-9][0-9]*)
 STRING   ["][^\0]*["]
-COMMENT  [-][-].*
+COMMENT  [-][-][^\n]*[\n<<EOF>>]
 
 ELSE     [eE][Ll][Ss][Ee]
 IF       [iI][fF]
@@ -30,49 +31,40 @@ FALSE    [F][aA][lL][sS][eE]
 
 {WS}+      {} 
 
-"-"        { std::cout << "Token type: " << "OPERATOR,     " << "Value: " << "MINUS"         << "\n"; }
-"+"        { std::cout << "Token type: " << "OPERATOR,     " << "Value: " << "PLUS"          << "\n"; }
-"*"        { std::cout << "Token type: " << "OPERATOR,     " << "Value: " << "MUL"           << "\n"; }
-"/"        { std::cout << "Token type: " << "OPERATOR,     " << "Value: " << "DIV"           << "\n"; }
-"%"        { std::cout << "Token type: " << "OPERATOR,     " << "Value: " << "MOD"           << "\n"; }
-"("        { std::cout << "Token type: " << "ARITH SYNTAX, " << "Value: " << "LPAREN"        << "\n"; }
-")"        { std::cout << "Token type: " << "ARITH SYNTAX, " << "Value: " << "RPAREN"        << "\n"; }
-"="        { std::cout << "Token type: " << "OPERATOR,     " << "Value: " << "ASSIGN"        << "\n"; }    
-     
-{ELSE}     { std::cout << "Token type: " << "KEYWORD,      " << "Value: " << yytext          << "\n"; }    
-{IF}       { std::cout << "Token type: " << "KEYWORD,      " << "Value: " << yytext          << "\n"; }    
-{LOOP}     { std::cout << "Token type: " << "KEYWORD,      " << "Value: " << yytext          << "\n"; }    
-{THEN}     { std::cout << "Token type: " << "KEYWORD,      " << "Value: " << yytext          << "\n"; }    
-{WHILE}    { std::cout << "Token type: " << "KEYWORD,      " << "Value: " << yytext          << "\n"; }    
-{NOT}      { std::cout << "Token type: " << "KEYWORD,      " << "Value: " << yytext          << "\n"; }    
-{PRINT}    { std::cout << "Token type: " << "KEYWORD,      " << "Value: " << yytext          << "\n"; }    
-{PRINTLN}  { std::cout << "Token type: " << "KEYWORD,      " << "Value: " << yytext          << "\n"; }    
+"-"        make_MINUS(); 
+"+"        make_PLUS();    
+"*"        make_MUL();     
+"/"        make_DIV();     
+"%"        make_MOD();     
+"("        make_LPAREN();  
+")"        make_RPAREN();  
+"="        make_ASSIGN();
+
+{ELSE}     make_ELSE();        
+{IF}       make_IF();        
+{LOOP}     make_LOOP();        
+{THEN}     make_THEN();        
+{WHILE}    make_WHILE();       
+{NOT}      make_NOT();        
+{PRINT}    make_PRINT();       
+{PRINTLN}  make_PRINTLN();    
  
-{TRUE}     { std::cout << "Token type: " << "KEYWORD,      " << "Value: " << yytext          << "\n"; }    
-{FALSE}    { std::cout << "Token type: " << "KEYWORD,      " << "Value: " << yytext          << "\n"; }    
- 
-"<"        { std::cout << "Token type: " << "OPERATOR,     " << "Value: " << "LESS"          << "\n"; }
-">"        { std::cout << "Token type: " << "OPERATOR,     " << "Value: " << "GREATER"       << "\n"; }
-"=="       { std::cout << "Token type: " << "OPERATOR,     " << "Value: " << "EQUAL"         << "\n"; }
-"!="       { std::cout << "Token type: " << "OPERATOR,     " << "Value: " << "NOT EQUAL"     << "\n"; }
-"<="       { std::cout << "Token type: " << "OPERATOR,     " << "Value: " << "LESS EQUAL"    << "\n"; }
-">="       { std::cout << "Token type: " << "OPERATOR,     " << "Value: " << "GREATER EQUAL" << "\n"; }
-"&&"       { std::cout << "Token type: " << "OPERATOR,     " << "Value: " << "AND"           << "\n"; }
-"||"       { std::cout << "Token type: " << "OPERATOR,     " << "Value: " << "OR"            << "\n"; }
- 
-{NUMBER}   { std::cout << "Token type: " << "NUMBER,       " << "Value: " << yytext          << "\n"; }
-{ID}       { std::cout << "Token type: " << "ID,           " << "Value: " << yytext          << "\n"; }
-{COMMENT}  { std::cout << "Token type: " << "COMMENT,      " << "Value: " << yytext          << "\n"; }
-{STRING}   { std::cout << "Token type: " << "STRING,       " << "Value: " << yytext          << "\n"; }
-{TYPEID}   { std::cout << "Token type: " << "TYPE ID,      " << "Value: " << yytext          << "\n"; }
-.          { std::cout << "Token type: " << "UNKNOWN,      " << "\n";                                   }
+{TRUE}     make_TRUE();              
+{FALSE}    make_FALSE();           
+"<"        make_LESS();          
+">"        make_GREATER();       
+"=="       make_EQUAL();         
+"!="       make_NOT_EQUAL();     
+"<="       make_LESS_EQUAL();    
+">="       make_GREATER_EQUAL(); 
+"&&"       make_AND();           
+"||"       make_OR();            
+{NUMBER}   make_NUMBER();       
+{ID}       make_ID();          
+{COMMENT}  make_COMMENT();      
+{STRING}   make_STRING();       
+{TYPEID}   make_TYPEID();       
+.          make_UNKNOWN();      
 
 %%
 
-int main()
-{
-    FlexLexer* lexer = new yyFlexLexer;
-    while(lexer->yylex() != 0);
-    delete lexer;
-    return 0;
-}
