@@ -59,16 +59,6 @@ void make_MOD()
     std::cout << "Token type: " << "OPERATOR,     " << "Value: " << "MOD"           << "\n"; 
 }
 
-void make_LPAREN()
-{
-    std::cout << "Token type: " << "ARITH SYNTAX, " << "Value: " << "LPAREN"        << "\n";
-}
-
-void make_RPAREN()
-{
-    std::cout << "Token type: " << "ARITH SYNTAX, " << "Value: " << "RPAREN"        << "\n";
-}
-
 void make_ASSIGN()
 {
     std::cout << "Token type: " << "OPERATOR,     " << "Value: " << "ASSIGN"        << "\n";

@@ -13,7 +13,6 @@ ID       [a-z][a-zA-Z_0-9]*
 TYPEID   [A-Z][a-zA-Z_0-9]*
 NUMBER   (0|[1-9][0-9]*)
 STRING   ["][^\0]*["]
-COMMENT  [-][-][^\n]*[\n<<EOF>>]
 
 ELSE     [eE][Ll][Ss][Ee]
 IF       [iI][fF]
@@ -27,17 +26,18 @@ PRINTLN  [pP][rR][iI][nN][tT][lL][nN]
 TRUE     [T][rR][uU][eE]
 FALSE    [F][aA][lL][sS][eE]
 
+%x       COMMENT
+%x       MUL_LINE_COMMENT
+
 %%
 
-{WS}+      {} 
+{WS}+      /* empty */
 
 "-"        make_MINUS(); 
 "+"        make_PLUS();    
 "*"        make_MUL();     
 "/"        make_DIV();     
 "%"        make_MOD();     
-"("        make_LPAREN();  
-")"        make_RPAREN();  
 "="        make_ASSIGN();
 
 {ELSE}     make_ELSE();        
@@ -58,12 +58,31 @@ FALSE    [F][aA][lL][sS][eE]
 "<="       make_LESS_EQUAL();    
 ">="       make_GREATER_EQUAL(); 
 "&&"       make_AND();           
-"||"       make_OR();            
+"||"       make_OR();
+
 {NUMBER}   make_NUMBER();       
 {ID}       make_ID();          
-{COMMENT}  make_COMMENT();      
 {STRING}   make_STRING();       
-{TYPEID}   make_TYPEID();       
+{TYPEID}   make_TYPEID();
+
+"--"       BEGIN(COMMENT);
+
+<COMMENT>
+{
+    [^<<EOF>>\n]* /* empty */
+    [\n<<EOF>>]   BEGIN(INITIAL);
+}
+
+"("        BEGIN(MUL_LINE_COMMENT);
+
+<MUL_LINE_COMMENT>
+{
+    [^)<<EOF>>]*      /* empty */
+    ")"+[^\n<<EOF>>]* /* empty */
+    ")"+[\n<<EOF>>]*  BEGIN(INITIAL);
+
+}
+
 .          make_UNKNOWN();      
 
 %%
