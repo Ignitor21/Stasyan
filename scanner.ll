@@ -14,7 +14,7 @@ WS       [ \n\f\r\t\v]
 ID       [a-z][a-zA-Z_0-9]*
 TYPEID   [A-Z][a-zA-Z_0-9]*
 NUMBER   (0|[1-9][0-9]*)
-STRING   ["][^\0]*["]
+STRING   ["][^\0<<EOF>>]*["]
 
 ELSE     [eE][Ll][Ss][Ee]
 IF       [iI][fF]
@@ -85,10 +85,10 @@ FALSE    [F][aA][lL][sS][eE]
     "/*"        ++comment_counter;
     "*/"        --comment_counter; if(comment_counter == 0) BEGIN(INITIAL);
     [^<<EOF>>]* /* empty */
-    <<EOF>>     make_UNKNOWN(); return 0;
+    <<EOF>>     LexerError("Error: EOF inside of comment");
 }
 
-.          make_UNKNOWN(); return 0;      
+.          LexerError("Error: unknown character");
 
 %%
 
