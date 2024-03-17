@@ -3,6 +3,8 @@
   #include <string>
   #include <limits>
   #include "scanner.hxx"
+
+  int comment_counter = 0;
 %}
 
 %option c++ noyywrap nounput noinput batch
@@ -37,7 +39,9 @@ FALSE    [F][aA][lL][sS][eE]
 "+"        make_PLUS();    
 "*"        make_MUL();     
 "/"        make_DIV();     
-"%"        make_MOD();     
+"%"        make_MOD();
+"("        make_LPAREN();
+")"        make_RPAREN();
 "="        make_ASSIGN();
 
 {ELSE}     make_ELSE();        
@@ -50,7 +54,8 @@ FALSE    [F][aA][lL][sS][eE]
 {PRINTLN}  make_PRINTLN();    
  
 {TRUE}     make_TRUE();              
-{FALSE}    make_FALSE();           
+{FALSE}    make_FALSE();
+
 "<"        make_LESS();          
 ">"        make_GREATER();       
 "=="       make_EQUAL();         
@@ -73,17 +78,17 @@ FALSE    [F][aA][lL][sS][eE]
     [\n<<EOF>>]   BEGIN(INITIAL);
 }
 
-"("        BEGIN(MUL_LINE_COMMENT);
+"/*"              ++comment_counter; BEGIN(MUL_LINE_COMMENT);
 
 <MUL_LINE_COMMENT>
 {
-    [^)<<EOF>>]*      /* empty */
-    ")"+[^\n<<EOF>>]* /* empty */
-    ")"+[\n<<EOF>>]*  BEGIN(INITIAL);
-
+    "/*"        ++comment_counter;
+    "*/"        --comment_counter; if(comment_counter == 0) BEGIN(INITIAL);
+    [^<<EOF>>]* /* empty */
+    <<EOF>>     make_UNKNOWN(); return 0;
 }
 
-.          make_UNKNOWN();      
+.          make_UNKNOWN(); return 0;      
 
 %%
 

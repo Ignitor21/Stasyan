@@ -1,0 +1,4 @@
+Double z = 1
+/* /* /* It's a bad comment */ */
+
+println z

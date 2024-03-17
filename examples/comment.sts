@@ -2,14 +2,14 @@
 2 = 1 + 1
 --It's one line comment
 
-((( There
+/* /* /*
+There
 are
 a
 lot
 of
 lines
-)))
-
-((( Unclosed paren in comment ))
+*/ */
+*/
 
 Int tmp = 228

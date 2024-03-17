@@ -26,7 +26,7 @@ int scan_begin(const std::string& file)
 
     if (!input.is_open())
     {
-        std::cerr << "Can't open file\n";
+        std::cerr << "Can't open file " << file << "\n";
         return -1;
     }
 
@@ -57,6 +57,16 @@ void make_DIV()
 void make_MOD()
 { 
     std::cout << "Token type: " << "OPERATOR,     " << "Value: " << "MOD"           << "\n"; 
+} 
+
+void make_LPAREN()
+{
+    std::cout << "Token type: " << "ARITH SYNTAX, " << "Value: " << "LPAREN"        << "\n";
+}
+
+void make_RPAREN()
+{
+    std::cout << "Token type: " << "ARITH SYNTAX, " << "Value: " << "RPAREN"        << "\n";
 }
 
 void make_ASSIGN()
@@ -181,7 +191,7 @@ void make_TYPEID()
 
 void make_UNKNOWN()
 {
-    std::cout << "Token type: " << "UNKNOWN,      "                                 << "\n";
+    std::cout << "Token type: " << "UNKNOWN       "                                 << "\n";
 }
 
 };
